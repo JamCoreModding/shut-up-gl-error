@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Shut Up GL Error" src="https://github.com/JamCoreModding/shut-up-gl-error/blob/main/common/src/main/resources/assets/shut_up_gl_error/icon.png?raw=true" />
+    <img alt="Shut Up GL Error" height="100" src="https://github.com/JamCoreModding/shut-up-gl-error/blob/main/common/src/main/resources/assets/shut_up_gl_error/icon.png?raw=true" />
 <p align="center">
 
 <p align="center">
