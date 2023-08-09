@@ -1,23 +1,25 @@
-# JamCore Multi-loader Template Mod
+<p align="center">
+    <img alt="Shut Up GL Error" src="https://github.com/JamCoreModding/shut-up-gl-error/blob/main/common/src/main/resources/assets/shut_up_gl_error/icon.png" />
+<p align="center">
 
 <p align="center">
     <img alt="forge" height="25" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/supported/forge_vector.svg">
     <img alt="fabric" height="25" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/supported/fabric_vector.svg">
 </p>
 
-This repository uses a system I created called
-[easytemplate](https://github.com/Jamalam360/easytemplate) to initialize the
-template automatically. After following the easytemplate prompt, you shouldn't
-have to make any changes before starting programming.
+Fixes invalid keycodes logging obnoxious and constant messages:
 
-1. Install [Deno](https://deno.land/)
-2. Click `Use This Template`
-3. Clone the repository.
-4. Run `deno run --allow-read --allow-write https://raw.githubusercontent.com/Jamalam360/easytemplate/main/easytemplate.ts` in
-   the repository directory.
-5. Follow the instructions.
+```
+########## GL ERROR ##########
+@ Pre render
+65539: Invalid key -1
+```
 
-## License
+I played on my modpack, where I have many unbound keys, for 3 hours and **4000** of these errors were logged.
 
-This repository contains the MIT license for ease of use, but you can change it
-to whatever you want.
+## The Solution
+
+This mod simply patches the `InputConstants#isKeyDown` method to return `false` when the keycode is `-1` or `0`. There
+was never a real error going on here - not the kind you should have to worry about and definitely not the kind that
+should pollute logs constantly.
+

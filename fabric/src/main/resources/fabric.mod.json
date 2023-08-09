@@ -1,28 +1,28 @@
 {
     "schemaVersion": 1,
-    "id": "{{ mod_id }}",
+    "id": "shut_up_gl_error",
     "version": "${version}",
-    "name": "{{ name }}",
-    "description": "{{ description }}",
+    "name": "Shut Up GL Error",
+    "description": "Fixes invalid keycodes logging obnoxious and constant messages",
     "authors": [
-        "{{ author }}"
+        "Jamalam"
     ],
     "contact": {
-        "homepage": "https://github.com/{{github_owner}}/{{github_repo}}",
-        "sources": "https://github.com/{{github_owner}}/{{github_repo}}",
-        "issues": "https://github.com/{{github_owner}}/{{github_repo}}/issues"
+        "homepage": "https://github.com/JamCoreModding/shut-up-gl-error",
+        "sources": "https://github.com/JamCoreModding/shut-up-gl-error",
+        "issues": "https://github.com/JamCoreModding/shut-up-gl-error/issues"
     },
     "license": "MIT",
-    "icon": "assets/{{mod_id}}/icon.png",
-    "environment": "*",
+    "icon": "assets/shut_up_gl_error/icon.png",
+    "environment": "client",
     "entrypoints": {
         "main": [
-            "{{group}}.{{mod_id}}.{{main_class}}Fabric"
+            "io.github.jamalam360.shut_up_gl_error.ShutUpGLErrorFabric"
         ]
     },
     "mixins": [
-        "{{mod_id}}.mixins.json",
-        "{{mod_id}}.fabric.mixins.json"
+        "shut_up_gl_error.mixins.json",
+        "shut_up_gl_error.fabric.mixins.json"
     ],
     "depends": {
         "fabricloader": ">=0.14",
