@@ -48,14 +48,12 @@
     {
       "type": "boolean",
       "id": "github_publish",
-      "label": "Publish to GitHub?",
-      "default": true
+      "label": "Publish to GitHub?"
     },
     {
       "type": "boolean",
       "id": "unified_publishing",
-      "label": "Enable Unified Publishing (Modrinth + Curseforge)?",
-      "default": true
+      "label": "Enable Unified Publishing (Modrinth + Curseforge)?"
     }
   ],
   "move": [
