@@ -1,0 +1,22 @@
+[versions]
+mixin = "0.8.5"
+
+# Forge
+forge = "1.20.1-47.1.43"
+
+# Fabric
+# https://fabricmc.net/develop
+fabric-loader = "0.14.21"
+fabric-api = "0.86.1+1.20.1"
+
+# https://modrinth.com/mods/modmenu/versions
+modmenu = "eTCL1uh8"
+
+[libraries]
+mixin = { module = "org.spongepowered:mixin", version.ref = "mixin" }
+
+forge = { module = "net.minecraftforge:forge", version.ref = "forge" }
+
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
+modmenu = { module = "maven.modrinth:modmenu", version.ref = "modmenu" }
