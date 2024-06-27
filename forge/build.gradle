@@ -69,18 +69,20 @@ if (System.getenv("CURSEFORGE_API_KEY") != null && System.getenv("MODRINTH_API_K
             changelog = rootProject.file("CHANGELOG.md").text
             releaseType = project.version.contains("beta") ? "beta" : "release"
             gameVersions = [project.minecraft_version]
-            gameLoaders = ["forge", "neoforge"]
+            gameLoaders = ["forge"]
 
             mainPublication tasks.jar
 
             curseforge {
                 token = System.getenv("CURSEFORGE_API_KEY")
                 id = "900855"
+                gameLoaders.add("NeoForge")
             }
 
             modrinth {
                 token = System.getenv("MODRINTH_API_KEY")
-                id = "shut-up-gl-error"
+                id = "houIxdGF"
+                gameLoaders.add("neoforge")
             }
         }
     }
