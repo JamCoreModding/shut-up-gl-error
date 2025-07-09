@@ -30,4 +30,4 @@ dependencyResolutionManagement {
 rootProject.name = "shut_up_gl_error"
 include("common")
 include("fabric")
-include("forge")
+include("neoforge")

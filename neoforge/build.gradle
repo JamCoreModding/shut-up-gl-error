@@ -5,17 +5,11 @@ plugins {
 
 architectury {
     platformSetupLoomIde()
-    forge()
+    neoForge()
 }
 
 base {
-    archivesName = "shut_up_gl_error-forge"
-}
-
-loom {
-    forge {
-        mixinConfig "shut_up_gl_error.mixins.json"
-    }
+    archivesName = "shut_up_gl_error-neoforge"
 }
 
 configurations {
@@ -23,36 +17,36 @@ configurations {
     shadowCommon
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
-    developmentForge.extendsFrom common
+    developmentNeoForge.extendsFrom common
 }
 
 repositories {
     maven {
-        name = "Forge"
-        url = "https://maven.minecraftforge.net"
+        name = "NeoForge"
+        url = "https://maven.neoforged.net"
     }
 }
 
 dependencies {
-    forge libs.forge
-    modImplementation libs.architectury.forge
-    modImplementation libs.jamlib.forge
+    neoForge libs.neoforge
+    modImplementation libs.architectury.neoforge
+    modImplementation libs.jamlib.neoforge
 
     // Dependency of JamLib
     forgeRuntimeLibrary "blue.endless:jankson:1.2.3"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
 }
 
 if (System.getenv("CURSEFORGE_API_KEY") != null && System.getenv("MODRINTH_API_KEY") != null) {
     unifiedPublishing {
         project {
-            displayName = "V${project.version} (Forge ${project.minecraft_version})"
+            displayName = "V${project.version} (NeoForge ${project.minecraft_version})"
             changelog = rootProject.file("CHANGELOG.md").text
             releaseType = project.version.contains("beta") ? "beta" : "release"
             gameVersions = [project.minecraft_version, *(project.additional_minecraft_versions == "" ? [] : project.additional_minecraft_versions.split(","))]
-            gameLoaders = ["forge"]
+            gameLoaders = ["neoforge"]
 
             mainPublication tasks.remapJar
 
@@ -85,11 +79,12 @@ processResources {
     def substitutions = [
             "version"             : project.version,
             "minecraft_version"   : project.minimum_minecraft_version,
+            "neoforge_version"    : project.minimum_minecraft_version.substring(2),
             "architectury_version": project.minimum_architectury_api_version,
             "jamlib_version"      : project.minimum_jamlib_version
     ]
 
-    filesMatching("META-INF/mods.toml") {
+    filesMatching("META-INF/neoforge.mods.toml") {
         expand substitutions
     }
 
