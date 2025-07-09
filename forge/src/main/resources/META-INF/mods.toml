@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/JamCoreModding/shut-up-gl-error/issues"
 
 [[mods]]
 modId = "shut_up_gl_error"
-version = "${file.jarVersion}"
+version = "${version}"
 displayName = "Shut Up GL Error"
 displayURL="https://github.com/JamCoreModding/shut-up-gl-error"
 logoFile = "icon.png"
@@ -17,13 +17,27 @@ Fixes invalid keycodes logging obnoxious and constant messages
 [[dependencies.shut_up_gl_error]]
 modId = "forge"
 mandatory = true
-versionRange = "[47,)"
+versionRange = "[47.4.0,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.shut_up_gl_error]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.20,1.21)"
+versionRange = "[${minecraft_version},)"
 ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.shut_up_gl_error]]
+modId = "architectury"
+mandatory = true
+versionRange = "[${architectury_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.shut_up_gl_error]]
+modId = "jamlib"
+mandatory = true
+versionRange = "[${jamlib_version},)"
+ordering = "AFTER"
 side = "BOTH"

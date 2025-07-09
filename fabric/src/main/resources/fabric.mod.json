@@ -21,13 +21,12 @@
         ]
     },
     "mixins": [
-        "shut_up_gl_error.mixins.json",
-        "shut_up_gl_error.fabric.mixins.json"
+        "shut_up_gl_error.mixins.json"
     ],
     "depends": {
-        "fabricloader": ">=0.14",
-        "fabric": "*",
-        "minecraft": ">=1.20",
-        "java": ">=17"
+        "fabric": ">=${fabric_api_version}",
+        "minecraft": ">=${minecraft_version}",
+        "architectury": ">=${architectury_version}",
+        "jamlib": ">=${jamlib_version}"
     }
 }

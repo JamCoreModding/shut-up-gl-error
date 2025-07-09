@@ -1,65 +1,48 @@
 plugins {
-    id "idea"
-    id "net.minecraftforge.gradle"
-    id "org.spongepowered.mixin"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
     id "me.shedaniel.unified-publishing"
 }
 
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
 base {
-    archivesName = "${mod_name}-forge-${minecraft_version}"
+    archivesName = "shut_up_gl_error-forge"
 }
 
-mixin {
-    add(sourceSets.main, "${mod_id}.refmap.json")
-
-    config("${project.mod_id}.mixins.json")
-    config("${mod_id}.forge.mixins.json")
-}
-
-minecraft {
-    mappings channel: "official", version: minecraft_version
-
-    if (file("src/main/resources/META-INF/accesstransformer.cfg").exists()) {
-        accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
+loom {
+    forge {
+        mixinConfig "shut_up_gl_error.mixins.json"
     }
+}
 
-    runs {
-        client {
-            workingDirectory project.file("run")
-            ideaModule "${rootProject.name}.${project.name}.main"
-            taskName "Client"
-            property "mixin.env.remapRefMap", "true"
-            property "mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg"
-            mods {
-                modClientRun {
-                    source sourceSets.main
-                    source project(":common").sourceSets.main
-                }
-            }
-        }
+configurations {
+    common
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+}
 
-        server {
-            workingDirectory project.file("run")
-            ideaModule "${rootProject.name}.${project.name}.main"
-            taskName "Server"
-            property "mixin.env.remapRefMap", "true"
-            property "mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg"
-            mods {
-                modServerRun {
-                    source sourceSets.main
-                    source project(":common").sourceSets.main
-                }
-            }
-        }
+repositories {
+    maven {
+        name = "Forge"
+        url = "https://maven.minecraftforge.net"
     }
 }
 
 dependencies {
-    minecraft libs.forge
-    compileOnly project(":common")
-    annotationProcessor variantOf(libs.mixin) {
-        classifier("processor")
-    }
+    forge libs.forge
+    modImplementation libs.architectury.forge
+    modImplementation libs.jamlib.forge
+
+    // Dependency of JamLib
+    forgeRuntimeLibrary "blue.endless:jankson:1.2.3"
+
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 }
 
 if (System.getenv("CURSEFORGE_API_KEY") != null && System.getenv("MODRINTH_API_KEY") != null) {
@@ -68,40 +51,72 @@ if (System.getenv("CURSEFORGE_API_KEY") != null && System.getenv("MODRINTH_API_K
             displayName = "V${project.version} (Forge ${project.minecraft_version})"
             changelog = rootProject.file("CHANGELOG.md").text
             releaseType = project.version.contains("beta") ? "beta" : "release"
-            gameVersions = [project.minecraft_version]
+            gameVersions = [project.minecraft_version, *(project.additional_minecraft_versions == "" ? [] : project.additional_minecraft_versions.split(","))]
             gameLoaders = ["forge"]
 
-            mainPublication tasks.jar
+            mainPublication tasks.remapJar
+
+            relations {
+                depends {
+                    curseforge = "architectury-api"
+                    modrinth = "architectury-api"
+                }
+
+                depends {
+                    curseforge = "jamlib"
+                    modrinth = "jamlib"
+                }
+            }
 
             curseforge {
                 token = System.getenv("CURSEFORGE_API_KEY")
                 id = "900855"
-                gameLoaders.add("NeoForge")
             }
 
             modrinth {
                 token = System.getenv("MODRINTH_API_KEY")
                 id = "houIxdGF"
-                gameLoaders.add("neoforge")
             }
         }
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    source(project(":common").sourceSets.main.allSource)
-}
-
-tasks.withType(Javadoc).configureEach {
-    source(project(":common").sourceSets.main.allJava)
-}
-
-tasks.named("sourcesJar", Jar) {
-    from(project(":common").sourceSets.main.allSource)
-}
-
 processResources {
-    from project(":common").sourceSets.main.resources
+    def substitutions = [
+            "version"             : project.version,
+            "minecraft_version"   : project.minimum_minecraft_version,
+            "architectury_version": project.minimum_architectury_api_version,
+            "jamlib_version"      : project.minimum_jamlib_version
+    ]
+
+    filesMatching("META-INF/mods.toml") {
+        expand substitutions
+    }
+
+    substitutions.each { inputs.property it.key, it.value }
 }
 
-jar.finalizedBy("reobfJar")
+shadowJar {
+    exclude "fabric.mod.json"
+    exclude "architectury.common.json"
+
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+}
+
+sourcesJar {
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}

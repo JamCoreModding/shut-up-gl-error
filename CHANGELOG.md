@@ -1,1 +1,2 @@
-Initial release.
+- Update to use Architectury
+- Add config

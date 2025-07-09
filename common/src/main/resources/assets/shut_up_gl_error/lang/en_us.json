@@ -1,0 +1,8 @@
+{
+  "config.shut_up_gl_error.discord": "Chat on Discord",
+  "config.shut_up_gl_error.github": "Report Issues on GitHub",
+  "config.shut_up_gl_error.mode": "Mode",
+  "config.shut_up_gl_error.mode.silent": "Silent",
+  "config.shut_up_gl_error.mode.log_once": "Log Once",
+  "config.shut_up_gl_error.mode.log_always": "Log Always"
+}

@@ -1,48 +1,34 @@
 plugins {
-    id "java"
-    id "idea"
-    id "fabric-loom"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
     id "me.shedaniel.unified-publishing"
 }
 
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
 base {
-    archivesName = "${mod_name}-fabric-${minecraft_version}"
+    archivesName = "shut_up_gl_error-fabric"
+}
+
+configurations {
+    common
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
     modImplementation libs.fabric.loader
     modImplementation libs.fabric.api
-    implementation project(":common")
+    modImplementation libs.architectury.fabric
+    modImplementation libs.modmenu
+    modImplementation libs.jamlib.fabric
 
-    modLocalRuntime libs.modmenu
-}
-
-loom {
-    if (project(":common").file("src/main/resources/${mod_id}.accesswidener").exists()) {
-        accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accesswidener"))
-    }
-
-    mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
-    }
-
-    runs {
-        client {
-            client()
-            setConfigName("Fabric Client")
-            ideConfigGenerated(true)
-            runDir("run")
-        }
-
-        server {
-            server()
-            setConfigName("Fabric Server")
-            ideConfigGenerated(true)
-            runDir("run")
-        }
-    }
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 }
 
 if (System.getenv("CURSEFORGE_API_KEY") != null && System.getenv("MODRINTH_API_KEY") != null) {
@@ -51,10 +37,27 @@ if (System.getenv("CURSEFORGE_API_KEY") != null && System.getenv("MODRINTH_API_K
             displayName = "V${project.version} (Fabric ${project.minecraft_version})"
             changelog = rootProject.file("CHANGELOG.md").text
             releaseType = project.version.contains("beta") ? "beta" : "release"
-            gameVersions = [project.minecraft_version]
-            gameLoaders = ["fabric", "quilt"]
+            gameVersions = [project.minecraft_version, *(project.additional_minecraft_versions == "" ? [] : project.additional_minecraft_versions.split(","))]
+            gameLoaders = ["fabric"]
 
             mainPublication tasks.remapJar
+
+            relations {
+                depends {
+                    curseforge = "fabric-api"
+                    modrinth = "fabric-api"
+                }
+
+                depends {
+                    curseforge = "architectury-api"
+                    modrinth = "architectury-api"
+                }
+
+                depends {
+                    curseforge = "jamlib"
+                    modrinth = "jamlib"
+                }
+            }
 
             curseforge {
                 token = System.getenv("CURSEFORGE_API_KEY")
@@ -69,18 +72,43 @@ if (System.getenv("CURSEFORGE_API_KEY") != null && System.getenv("MODRINTH_API_K
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    source(project(":common").sourceSets.main.allSource)
-}
-
-tasks.withType(Javadoc).configureEach {
-    source(project(":common").sourceSets.main.allJava)
-}
-
-tasks.named("sourcesJar", Jar) {
-    from(project(":common").sourceSets.main.allSource)
-}
-
 processResources {
-    from project(":common").sourceSets.main.resources
+    def substitutions = [
+            "version"             : project.version,
+            "minecraft_version"   : project.minimum_minecraft_version,
+            "fabric_api_version"  : project.minimum_fabric_api_version,
+            "architectury_version": project.minimum_architectury_api_version,
+            "jamlib_version"      : project.minimum_jamlib_version
+    ]
+
+    filesMatching("fabric.mod.json") {
+        expand substitutions
+    }
+
+    substitutions.each { inputs.property it.key, it.value }
+}
+
+shadowJar {
+    exclude "architectury.common.json"
+
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = "dev-shadow"
+}
+
+remapJar {
+    injectAccessWidener = true
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+}
+
+sourcesJar {
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
 }

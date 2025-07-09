@@ -1,21 +1,9 @@
-plugins {
-    id "java"
-    id "idea"
-    id "org.spongepowered.gradle.vanilla"
-}
-
-base {
-    archivesName = "${mod_name}-common-${minecraft_version}"
-}
-
-minecraft {
-    version(minecraft_version)
-
-    if(file("src/main/resources/${mod_id}.accesswidener").exists()){
-        accessWideners(file("src/main/resources/${mod_id}.accesswidener"))
-    }
+architectury {
+    common(rootProject.enabled_platforms.split(","))
 }
 
 dependencies {
-     compileOnly libs.mixin
+    modImplementation libs.fabric.loader
+    modImplementation libs.architectury.common
+    modImplementation libs.jamlib.common
 }
