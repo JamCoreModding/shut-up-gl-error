@@ -7,19 +7,21 @@ import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import io.github.jamalam360.jamlib.config.ConfigManager;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 
 public class ShutUpGLError {
 	public static final String MOD_ID = "shut_up_gl_error";
 	public static final ConfigManager<Config> CONFIG = new ConfigManager<>(MOD_ID, Config.class);
-	private static final KeyMapping TEST_KEYMAPPING = new KeyMapping("shut_up_gl_error.test", InputConstants.Type.KEYSYM, InputConstants.KEY_G, "shut_up_gl_error.category");
 
 	public static void init() {
 		if (Platform.isDevelopmentEnvironment()) {
-			KeyMappingRegistry.register(TEST_KEYMAPPING);
+			KeyMapping.Category category = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "shut_up_gl_error"));
+			KeyMapping keyMapping = new KeyMapping("shut_up_gl_error.test", InputConstants.Type.KEYSYM, InputConstants.KEY_G, category);
+			KeyMappingRegistry.register(keyMapping);
 
 			ClientTickEvent.CLIENT_LEVEL_PRE.register((level) -> {
-				if (TEST_KEYMAPPING.consumeClick()) {
-					InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), -1);
+				if (keyMapping.consumeClick()) {
+					InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), -1);
 				}
 			});
 		}

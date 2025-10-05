@@ -19,6 +19,6 @@ public class Config implements ConfigExtensions<Config> {
 	public enum Mode {
 		SILENT,
 		LOG_ONCE,
-		LOG_ALWAYS;
+		LOG_ALWAYS
 	}
 }
